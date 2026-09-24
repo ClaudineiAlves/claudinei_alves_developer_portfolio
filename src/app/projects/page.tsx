@@ -1,11 +1,12 @@
 "use client";
 
-import { projectsData } from "@/../utils/Data/projects-data";
 import ProjectCard from "@/components/sections/projects/project-card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useProjects } from "@/hooks/useTranslatedData";
 
 const ProjectsPage = () => {
   const { t } = useLanguage();
+  const projectsData = useProjects();
 
   return (
     <section id="projects" className="relative min-h-screen overflow-hidden">

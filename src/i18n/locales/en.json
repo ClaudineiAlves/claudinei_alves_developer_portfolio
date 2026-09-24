@@ -103,33 +103,33 @@
       },
       "2": {
         "name": "Transparência BR API",
-        "description": "Async REST API that aggregates and exposes Brazilian federal government transparency data, consuming the Portal da Transparência (CGU). Provides endpoints for corporate card spending, official travel, contracts, and bidding processes — with pagination, filters, and PostgreSQL caching.",
+        "description": "Async REST API built with FastAPI that exposes four datasets from Brazil's Federal Transparency Portal (CGU) — corporate card spending, official travel, contracts and public bids — through versioned /v1/ endpoints. Layered architecture, PostgreSQL with migrations, tests with the external service mocked, and CI on GitHub Actions.",
         "role": "Backend Developer",
-        "highlight_1": "End-to-end async architecture with FastAPI + asyncpg + SQLAlchemy 2, ensuring high throughput without I/O blocking.",
-        "highlight_2": "HTTP client with automatic retry on 429 (rate limit) for stable consumption of the Portal da Transparência API.",
-        "highlight_3": "Versioned endpoints (/v1/*) with Pydantic parameter validation and automatic interactive documentation (Swagger/ReDoc).",
-        "challenge_1": "Handling the rate limits and inconsistencies of the CGU public API, implementing robust retry logic and error handling.",
-        "challenge_2": "Modeling Alembic database migrations in an async environment, ensuring compatibility between SQLAlchemy 2 and asyncpg."
+        "highlight_1": "Explicit layers (api, services, clients, schemas, models, core): business logic depends neither on FastAPI nor on the external API's format.",
+        "highlight_2": "pytest suite covering all four resources, with the Portal mocked via pytest-httpx so tests don't depend on the source being available, running on GitHub Actions on every push.",
+        "highlight_3": "httpx client with retry on 429 and explicit timeouts, custom exceptions with centralized handling, and a /health endpoint.",
+        "challenge_1": "Keeping the integration stable under the Transparency Portal's rate limit, turning third-party failures into predictable API responses instead of stack traces.",
+        "challenge_2": "Versioning the PostgreSQL schema with Alembic on an async stack (SQLAlchemy 2 + asyncpg), so the environment can be rebuilt from scratch with no manual steps."
       },
       "3": {
-        "name": "Project Name",
-        "description": "Brief project description. Explain what problem it solves, what the main features are, and what technology was used to build it.",
-        "role": "Your role in the project (e.g. Full-Stack Developer, Frontend Developer)",
-        "highlight_1": "An important feature or characteristic of the project.",
-        "highlight_2": "Another relevant implementation highlight.",
-        "highlight_3": "An interesting technology or architecture used.",
-        "challenge_1": "Main technical challenge faced during development.",
-        "challenge_2": "Architecture, performance, or integration problem that needed to be solved."
+        "name": "Local-LLM Email Triage Agent",
+        "description": "Agent that sorts incoming email into 8 semantic categories with an LLM running locally (Ollama + llama3.1), orchestrated by self-hosted n8n on Docker Compose. Prompt, categories and thresholds live in versioned YAML, and no content is sent to third-party APIs.",
+        "role": "Python Developer",
+        "highlight_1": "0.6 confidence threshold with a manual review route: below it, the email goes to a review queue instead of getting a guessed label.",
+        "highlight_2": "Prompt, category descriptions and thresholds kept in versioned configuration, outside the execution flow: changing behavior doesn't require editing the workflow.",
+        "highlight_3": "Python watchdog triggered by a systemd timer, outside the container, that queries the execution database and alerts when there's no activity within the expected window.",
+        "challenge_1": "Diagnosing a silent failure: the model returned labels outside the expected set without raising any error. I traced the cause to the context window and measured accuracy on a batch of real emails before and after the fix.",
+        "challenge_2": "Making sure an outage can't go unnoticed: a credential expired silently and triage stopped for 38 days without anyone noticing — which led to the out-of-container watchdog."
       },
       "4": {
-        "name": "Project Name",
-        "description": "Brief project description. Explain what problem it solves, what the main features are, and what technology was used to build it.",
-        "role": "Your role in the project (e.g. Full-Stack Developer, Frontend Developer)",
-        "highlight_1": "An important feature or characteristic of the project.",
-        "highlight_2": "Another relevant implementation highlight.",
-        "highlight_3": "An interesting technology or architecture used.",
-        "challenge_1": "Main technical challenge faced during development.",
-        "challenge_2": "Architecture, performance, or integration problem that needed to be solved."
+        "name": "Skin Analyser — AI Skin Lesion Triage",
+        "description": "Classification pipeline for dermoscopic images from the public HAM10000 dataset: OpenCV preprocessing, patient-level splits with no data leakage, 8 CNN architectures compared with transfer learning, and evaluation by F1, recall, AUC and confusion matrix. A triage project: it does not diagnose.",
+        "role": "Machine Learning Developer",
+        "highlight_1": "Train, validation and test sets split by patient_id with class stratification: images from the same patient never land in different partitions.",
+        "highlight_2": "8 architectures (MobileNetV2, EfficientNetB0, ResNet50, InceptionV3, DenseNet121, Xception, VGG19 and NASNetMobile) compared under an identical protocol, in a parameterized pipeline where only the configuration changes.",
+        "highlight_3": "Runs and metrics persisted in Supabase, with a daily KPI dashboard — accuracy, sensitivity and specificity — built on PostgreSQL materialized views.",
+        "challenge_1": "Designing validation so the numbers mean something: patient-level splits and recall prioritized for the class with the highest clinical risk.",
+        "challenge_2": "Controlling overfitting with augmentation, dropout, L2 regularization, early stopping and learning-rate reduction on plateau, tracking the train/validation gap every epoch."
       },
       "5": {
         "name": "Project Name",
@@ -232,6 +232,7 @@
     "view_project": "View Project",
     "view_code": "View Code",
     "highlights_title": "Key Features",
+    "challenges_title": "Technical Challenges",
     "gallery_title": "Project Images",
     "tech_title": "Technologies Used",
     "details_title": "Project Details",

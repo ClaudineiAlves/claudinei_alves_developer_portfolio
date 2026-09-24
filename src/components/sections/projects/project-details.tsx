@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useProjects } from "@/hooks/useTranslatedData";
 import { Project } from "@/Types/types";
 import {
   ArrowLeft,
@@ -21,6 +22,7 @@ import {
   Globe,
   ShieldCheck,
   User,
+  Wrench,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,8 +31,11 @@ interface ProjectDetailsProps {
   project: Project;
 }
 
-const ProjectDetails = ({ project }: ProjectDetailsProps) => {
+const ProjectDetails = ({ project: rawProject }: ProjectDetailsProps) => {
   const { t } = useLanguage();
+  // O servidor entrega o projeto cru (em PT); o texto no idioma ativo vem do contexto.
+  const project: Project =
+    useProjects().find((p) => p.id === rawProject.id) ?? rawProject;
 
   return (
     <div className="min-h-screen text-white py-12 px-4 lg:px-8">
@@ -154,6 +159,33 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
                 ))}
               </ul>
             </section>
+
+            {/* Challenges */}
+            {project.challenges && project.challenges.length > 0 && (
+              <section className="flex flex-col gap-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-red-900/10 flex items-center justify-center border border-red-900/20 shrink-0">
+                    <Wrench className="w-6 h-6 text-red-600" />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white break-words">
+                    {t("project_detail.challenges_title")}
+                  </h2>
+                </div>
+                <ul className="grid grid-cols-1 gap-4">
+                  {project.challenges.map((challenge, index) => (
+                    <li
+                      key={index}
+                      className="group p-5 sm:p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-red-500/[0.03] hover:border-red-500/20 transition-all duration-300 flex gap-4"
+                    >
+                      <div className="mt-1.5 w-2 h-2 rounded-full bg-red-900 shadow-[0_0_10px_rgba(127,29,29,0.8)] shrink-0 group-hover:scale-125 transition-transform" />
+                      <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-medium">
+                        {challenge}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {/* Gallery */}
             {project.images && project.images.length > 1 && (

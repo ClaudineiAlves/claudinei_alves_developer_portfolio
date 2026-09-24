@@ -27,6 +27,7 @@ export interface Project {
   videos?: string[];
   published: boolean;
   highlights?: string[];
+  challenges?: string[];
 }
 
 export interface ProjectCardProps {

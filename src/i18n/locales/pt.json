@@ -103,33 +103,33 @@
       },
       "2": {
         "name": "Transparência BR API",
-        "description": "API REST async que agrega e expõe dados de transparência do governo federal brasileiro, consumindo o Portal da Transparência (CGU). Oferece endpoints para cartões corporativos, viagens a serviço, contratos e licitações, com paginação, filtros e cache em banco de dados PostgreSQL.",
+        "description": "API REST assíncrona em FastAPI que expõe quatro datasets do Portal da Transparência da CGU — cartões corporativos, viagens a serviço, contratos e licitações — em endpoints versionados /v1/. Arquitetura em camadas, PostgreSQL com migrations, testes com o serviço externo mockado e CI no GitHub Actions.",
         "role": "Desenvolvedor Backend",
-        "highlight_1": "Arquitetura async end-to-end com FastAPI + asyncpg + SQLAlchemy 2, garantindo alto throughput sem bloqueio de I/O.",
-        "highlight_2": "Cliente HTTP com retry automático em 429 (rate limit) para consumo estável da API do Portal da Transparência.",
-        "highlight_3": "Endpoints versionados (/v1/*) com validação de parâmetros via Pydantic e documentação interativa automática (Swagger/ReDoc).",
-        "challenge_1": "Lidar com os limites e inconsistências da API pública do Portal da Transparência (CGU), implementando retry e tratamento de erros robusto.",
-        "challenge_2": "Modelar migrações de banco com Alembic em ambiente async, garantindo compatibilidade entre SQLAlchemy 2 e asyncpg."
+        "highlight_1": "Camadas explícitas (api, services, clients, schemas, models, core): a regra de negócio não depende do FastAPI nem do formato da API externa.",
+        "highlight_2": "Suíte em pytest cobrindo os quatro recursos, com o Portal mockado via pytest-httpx para que os testes não dependam da disponibilidade da fonte, rodando no GitHub Actions a cada push.",
+        "highlight_3": "Cliente httpx com retry em 429 e timeout explícito, exceções próprias com tratamento centralizado e endpoint /health.",
+        "challenge_1": "Manter a integração estável sob o rate limit do Portal da Transparência, transformando erro de terceiro em resposta previsível da API em vez de stack trace.",
+        "challenge_2": "Versionar o schema PostgreSQL com Alembic numa stack assíncrona (SQLAlchemy 2 + asyncpg), permitindo recriar o ambiente do zero sem passo manual."
       },
       "3": {
-        "name": "Nome do Projeto",
-        "description": "Breve descrição do projeto. Explique qual problema ele resolve, quais são as principais funcionalidades e qual tecnologia foi utilizada para desenvolvê-lo.",
-        "role": "Seu papel no projeto (ex: Desenvolvedor Full-Stack, Desenvolvedor Frontend)",
-        "highlight_1": "Funcionalidade ou característica importante do projeto.",
-        "highlight_2": "Outro destaque relevante da implementação.",
-        "highlight_3": "Tecnologia ou arquitetura interessante utilizada.",
-        "challenge_1": "Principal desafio técnico enfrentado durante o desenvolvimento.",
-        "challenge_2": "Problema de arquitetura, performance ou integração que precisou ser resolvido."
+        "name": "Agente de Triagem de E-mail com LLM Local",
+        "description": "Agente que classifica e-mails recebidos em 8 categorias semânticas com um LLM rodando localmente (Ollama + llama3.1), orquestrado por n8n self-hosted em Docker Compose. Prompt, categorias e limiares ficam num YAML versionado, e nenhum conteúdo é enviado para API de terceiro.",
+        "role": "Desenvolvedor Python",
+        "highlight_1": "Limiar de confiança de 0,6 com rota de revisão manual: abaixo dele, o e-mail vai para uma fila de revisão em vez de receber um rótulo chutado.",
+        "highlight_2": "Prompt, descrições das categorias e limiares em configuração versionada, fora do fluxo de execução: ajustar o comportamento não exige editar o workflow.",
+        "highlight_3": "Watchdog em Python disparado por systemd timer, fora do container, que consulta o banco de execuções e alerta quando não há atividade na janela esperada.",
+        "challenge_1": "Diagnosticar uma falha silenciosa: o modelo devolvia rótulos fora do conjunto previsto sem lançar erro. Isolei a causa na janela de contexto e medi o acerto num lote de e-mails reais antes e depois do ajuste.",
+        "challenge_2": "Garantir que uma parada não passe despercebida: uma credencial expirou em silêncio e a triagem ficou 38 dias parada sem ninguém notar — o que originou o watchdog fora do container."
       },
       "4": {
-        "name": "Nome do Projeto",
-        "description": "Breve descrição do projeto. Explique qual problema ele resolve, quais são as principais funcionalidades e qual tecnologia foi utilizada para desenvolvê-lo.",
-        "role": "Seu papel no projeto (ex: Desenvolvedor Full-Stack, Desenvolvedor Frontend)",
-        "highlight_1": "Funcionalidade ou característica importante do projeto.",
-        "highlight_2": "Outro destaque relevante da implementação.",
-        "highlight_3": "Tecnologia ou arquitetura interessante utilizada.",
-        "challenge_1": "Principal desafio técnico enfrentado durante o desenvolvimento.",
-        "challenge_2": "Problema de arquitetura, performance ou integração que precisou ser resolvido."
+        "name": "Skin Analyser — Triagem de Lesões Cutâneas com IA",
+        "description": "Pipeline de classificação de imagens dermatoscópicas do dataset público HAM10000: pré-processamento com OpenCV, separação por paciente sem vazamento de dados, 8 arquiteturas de CNN comparadas em transfer learning e avaliação por F1, recall, AUC e matriz de confusão. Projeto de triagem: não faz diagnóstico.",
+        "role": "Desenvolvedor de Machine Learning",
+        "highlight_1": "Treino, validação e teste separados por patient_id com estratificação por classe: imagens do mesmo paciente nunca caem em partições diferentes.",
+        "highlight_2": "8 arquiteturas (MobileNetV2, EfficientNetB0, ResNet50, InceptionV3, DenseNet121, Xception, VGG19 e NASNetMobile) comparadas sob protocolo idêntico, num pipeline parametrizado que troca só a configuração.",
+        "highlight_3": "Execuções e métricas persistidas no Supabase, com dashboard de KPIs diários — acurácia, sensibilidade e especificidade — sobre views materializadas no PostgreSQL.",
+        "challenge_1": "Montar a validação de um jeito que o número signifique alguma coisa: split por paciente e recall priorizado na classe de maior risco clínico.",
+        "challenge_2": "Controlar overfitting com augmentation, dropout, regularização L2, early stopping e redução de learning rate em platô, acompanhando o gap entre treino e validação a cada época."
       },
       "5": {
         "name": "Nome do Projeto",
@@ -232,6 +232,7 @@
     "view_project": "Visualizar Projeto",
     "view_code": "Ver Código",
     "highlights_title": "Principais Funcionalidades",
+    "challenges_title": "Desafios Técnicos",
     "gallery_title": "Imagens do Projeto",
     "tech_title": "Tecnologias Utilizadas",
     "details_title": "Detalhes do Projeto",

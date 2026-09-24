@@ -1,6 +1,6 @@
 "use client";
 
-import { projectsData } from "@/../utils/Data/projects-data";
+import { useProjects } from "@/hooks/useTranslatedData";
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +14,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const FeaturedProjects = () => {
   const { t } = useLanguage();
+  const projectsData = useProjects();
 
   return (
     <section id="projects" className="py-24 lg:py-48 overflow-hidden">
