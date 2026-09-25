@@ -103,13 +103,13 @@
       },
       "2": {
         "name": "Transparência BR API",
-        "description": "Async REST API built with FastAPI that exposes four datasets from Brazil's Federal Transparency Portal (CGU) — corporate card spending, official travel, contracts and public bids — through versioned /v1/ endpoints. Layered architecture, PostgreSQL with migrations, tests with the external service mocked, and CI on GitHub Actions.",
+        "description": "Async REST API built with FastAPI that exposes four datasets from Brazil's Federal Transparency Portal (CGU) — corporate card spending, official travel, contracts and public bids — through versioned /v1/ endpoints. Every page fetched is normalized and stored in PostgreSQL, and stored records can be filtered by agency, period and value range.",
         "role": "Backend Developer",
         "highlight_1": "Explicit layers (api, services, clients, schemas, models, core): business logic depends neither on FastAPI nor on the external API's format.",
         "highlight_2": "pytest suite covering all four resources, with the Portal mocked via pytest-httpx so tests don't depend on the source being available, running on GitHub Actions on every push.",
         "highlight_3": "httpx client with retry on 429 and explicit timeouts, custom exceptions with centralized handling, and a /health endpoint.",
         "challenge_1": "Keeping the integration stable under the Transparency Portal's rate limit, turning third-party failures into predictable API responses instead of stack traces.",
-        "challenge_2": "Versioning the PostgreSQL schema with Alembic on an async stack (SQLAlchemy 2 + asyncpg), so the environment can be rebuilt from scratch with no manual steps."
+        "challenge_2": "Normalizing heterogeneous Portal data — dates in two formats and values as Brazilian-formatted text — into DATE and NUMERIC, with a migration that converts existing data losslessly and background writes that keep the API up if the database goes down."
       },
       "3": {
         "name": "Local-LLM Email Triage Agent",

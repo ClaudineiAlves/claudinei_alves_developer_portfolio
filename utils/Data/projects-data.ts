@@ -47,7 +47,7 @@ const allProjects = [
     published: true,
     name: "Transparência BR API",
     description:
-      "API REST assíncrona em FastAPI que expõe quatro datasets do Portal da Transparência da CGU — cartões corporativos, viagens a serviço, contratos e licitações — em endpoints versionados /v1/. Arquitetura em camadas, PostgreSQL com migrations, testes com o serviço externo mockado e CI no GitHub Actions.",
+      "API REST assíncrona em FastAPI que expõe quatro datasets do Portal da Transparência da CGU — cartões corporativos, viagens a serviço, contratos e licitações — em endpoints versionados /v1/. Cada página consultada é normalizada e gravada em PostgreSQL, e o que foi gravado pode ser filtrado por órgão, período e faixa de valor.",
 
     tools: [
       "Python",
@@ -67,9 +67,7 @@ const allProjects = [
 
     code: "https://github.com/ClaudineiAlves/transparenciabr-api",
 
-    // O deploy do Railway respondia 404 em 24/09/2026. Quando voltar, restaure:
-    // "https://transparenciabr-api-production.up.railway.app/"
-    demo: "",
+    demo: "https://transparenciabr-api.onrender.com/docs",
 
     date: "2026-05-14",
 
@@ -90,7 +88,7 @@ const allProjects = [
 
     challenges: [
       "Manter a integração estável sob o rate limit do Portal da Transparência, transformando erro de terceiro em resposta previsível da API em vez de stack trace.",
-      "Versionar o schema PostgreSQL com Alembic numa stack assíncrona (SQLAlchemy 2 + asyncpg), permitindo recriar o ambiente do zero sem passo manual.",
+      "Normalizar dados heterogêneos do Portal — datas em dois formatos e valores em texto brasileiro — em DATE e NUMERIC, com uma migration que converte os dados existentes sem perda e gravação em background que não derruba a API se o banco cair.",
     ],
   },
   {

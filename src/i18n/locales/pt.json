@@ -103,13 +103,13 @@
       },
       "2": {
         "name": "Transparência BR API",
-        "description": "API REST assíncrona em FastAPI que expõe quatro datasets do Portal da Transparência da CGU — cartões corporativos, viagens a serviço, contratos e licitações — em endpoints versionados /v1/. Arquitetura em camadas, PostgreSQL com migrations, testes com o serviço externo mockado e CI no GitHub Actions.",
+        "description": "API REST assíncrona em FastAPI que expõe quatro datasets do Portal da Transparência da CGU — cartões corporativos, viagens a serviço, contratos e licitações — em endpoints versionados /v1/. Cada página consultada é normalizada e gravada em PostgreSQL, e o que foi gravado pode ser filtrado por órgão, período e faixa de valor.",
         "role": "Desenvolvedor Backend",
         "highlight_1": "Camadas explícitas (api, services, clients, schemas, models, core): a regra de negócio não depende do FastAPI nem do formato da API externa.",
         "highlight_2": "Suíte em pytest cobrindo os quatro recursos, com o Portal mockado via pytest-httpx para que os testes não dependam da disponibilidade da fonte, rodando no GitHub Actions a cada push.",
         "highlight_3": "Cliente httpx com retry em 429 e timeout explícito, exceções próprias com tratamento centralizado e endpoint /health.",
         "challenge_1": "Manter a integração estável sob o rate limit do Portal da Transparência, transformando erro de terceiro em resposta previsível da API em vez de stack trace.",
-        "challenge_2": "Versionar o schema PostgreSQL com Alembic numa stack assíncrona (SQLAlchemy 2 + asyncpg), permitindo recriar o ambiente do zero sem passo manual."
+        "challenge_2": "Normalizar dados heterogêneos do Portal — datas em dois formatos e valores em texto brasileiro — em DATE e NUMERIC, com uma migration que converte os dados existentes sem perda e gravação em background que não derruba a API se o banco cair."
       },
       "3": {
         "name": "Agente de Triagem de E-mail com LLM Local",
