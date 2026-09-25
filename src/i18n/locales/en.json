@@ -264,6 +264,7 @@
     "toggle_label": "Accessibility options",
     "high_contrast": "High contrast",
     "large_text": "Large text",
-    "reduced_motion": "Reduce animations"
+    "reduced_motion": "Reduce animations",
+    "skip_link": "Skip to main content"
   }
 }
