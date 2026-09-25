@@ -137,7 +137,7 @@ const allProjects = [
     published: true,
     name: "Skin Analyser — Triagem de Lesões Cutâneas com IA",
     description:
-      "Pipeline de classificação de imagens dermatoscópicas do dataset público HAM10000: pré-processamento com OpenCV, separação por paciente sem vazamento de dados, 8 arquiteturas de CNN comparadas em transfer learning e avaliação por F1, recall, AUC e matriz de confusão. Projeto de triagem: não faz diagnóstico.",
+      "Pipeline de classificação de imagens dermatoscópicas do dataset público HAM10000: pré-processamento com OpenCV, separação por lesão sem vazamento de dados, 8 arquiteturas de CNN comparadas em transfer learning e avaliação por F1, recall, AUC e matriz de confusão. Projeto de triagem: não faz diagnóstico.",
 
     tools: [
       "Python",
@@ -165,13 +165,13 @@ const allProjects = [
     videos: [],
 
     highlights: [
-      "Treino, validação e teste separados por patient_id com estratificação por classe: imagens do mesmo paciente nunca caem em partições diferentes.",
+      "Treino, validação e teste separados por lesão (lesion_id) com estratificação por classe: fotos da mesma lesão nunca caem em partições diferentes.",
       "8 arquiteturas (MobileNetV2, EfficientNetB0, ResNet50, InceptionV3, DenseNet121, Xception, VGG19 e NASNetMobile) comparadas sob protocolo idêntico, num pipeline parametrizado que troca só a configuração.",
       "Execuções e métricas persistidas no Supabase, com dashboard de KPIs diários — acurácia, sensibilidade e especificidade — sobre views materializadas no PostgreSQL.",
     ],
 
     challenges: [
-      "Montar a validação de um jeito que o número signifique alguma coisa: split por paciente e recall priorizado na classe de maior risco clínico.",
+      "Montar a validação de um jeito que o número signifique alguma coisa: o HAM10000 tem várias fotos da mesma lesão, então o split é por lesão, e o recall é priorizado na classe de maior risco clínico.",
       "Controlar overfitting com augmentation, dropout, regularização L2, early stopping e redução de learning rate em platô, acompanhando o gap entre treino e validação a cada época.",
     ],
   },

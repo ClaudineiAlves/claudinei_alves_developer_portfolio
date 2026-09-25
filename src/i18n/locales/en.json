@@ -123,12 +123,12 @@
       },
       "4": {
         "name": "Skin Analyser — AI Skin Lesion Triage",
-        "description": "Classification pipeline for dermoscopic images from the public HAM10000 dataset: OpenCV preprocessing, patient-level splits with no data leakage, 8 CNN architectures compared with transfer learning, and evaluation by F1, recall, AUC and confusion matrix. A triage project: it does not diagnose.",
+        "description": "Classification pipeline for dermoscopic images from the public HAM10000 dataset: OpenCV preprocessing, lesion-level splits with no data leakage, 8 CNN architectures compared with transfer learning, and evaluation by F1, recall, AUC and confusion matrix. A triage project: it does not diagnose.",
         "role": "Machine Learning Developer",
-        "highlight_1": "Train, validation and test sets split by patient_id with class stratification: images from the same patient never land in different partitions.",
+        "highlight_1": "Train, validation and test sets split by lesion (lesion_id) with class stratification: photos of the same lesion never land in different partitions.",
         "highlight_2": "8 architectures (MobileNetV2, EfficientNetB0, ResNet50, InceptionV3, DenseNet121, Xception, VGG19 and NASNetMobile) compared under an identical protocol, in a parameterized pipeline where only the configuration changes.",
         "highlight_3": "Runs and metrics persisted in Supabase, with a daily KPI dashboard — accuracy, sensitivity and specificity — built on PostgreSQL materialized views.",
-        "challenge_1": "Designing validation so the numbers mean something: patient-level splits and recall prioritized for the class with the highest clinical risk.",
+        "challenge_1": "Designing validation so the numbers mean something: HAM10000 has several photos of the same lesion, so splits are lesion-level, and recall is prioritized for the class with the highest clinical risk.",
         "challenge_2": "Controlling overfitting with augmentation, dropout, L2 regularization, early stopping and learning-rate reduction on plateau, tracking the train/validation gap every epoch."
       },
       "5": {
