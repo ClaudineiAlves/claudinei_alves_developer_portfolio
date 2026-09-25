@@ -30,7 +30,7 @@
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5; /* Cinza claro melhorado (mais contraste) */
   --text-muted: #a3a3a3; /* Cinza médio para descrições */
-  --text-subtle: #737373; /* Cinza escuro para metadados */
+  --text-subtle: #8a8a8a; /* Cinza para metadados: 4,5:1 até sobre --bg-tertiary */
 
   /* Glow/Shadows sutis */
   --glow-primary: rgba(239, 68, 68, 0.3);
@@ -312,6 +312,11 @@
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+
+/* Sem isso o span herda o cinza da regra base `p, span` e cai para 3,8:1 */
+.btn-primary span {
+  color: inherit;
 }
 
 .btn-primary:hover {

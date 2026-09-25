@@ -7,13 +7,13 @@ import RevealText from "@/components/RevealText";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-// Componente que renderiza SVG ou Icon
+// Componente que renderiza SVG ou Icon. É decorativo: o nome da skill já aparece ao lado.
 const SkillIconRender = ({ iconData }: { iconData: SkillIcon }) => {
   if (iconData.type === "svg") {
     return (
       <Image
         src={iconData.path}
-        alt="Skill"
+        alt=""
         width={32}
         height={32}
         className="w-8 h-8 object-contain"
@@ -21,7 +21,7 @@ const SkillIconRender = ({ iconData }: { iconData: SkillIcon }) => {
     );
   }
   const IconComponent = iconData.component;
-  return <IconComponent className="w-8 h-8" />;
+  return <IconComponent className="w-8 h-8" aria-hidden />;
 };
 
 const SkillItem = ({

@@ -44,9 +44,9 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-caption text-content-subtle mb-6 uppercase tracking-widest">
+            <h2 className="text-caption text-content-subtle mb-6 uppercase tracking-widest">
               {t("footer.nav_title")}
-            </h3>
+            </h2>
             <ul className="space-y-4">
               {navItems.map((item) => (
                 <li key={item.to}>
@@ -66,9 +66,9 @@ const Footer = () => {
           {/* Contact & Social */}
           <div className="flex flex-col gap-6">
             <div>
-              <h3 className="text-caption text-content-subtle mb-6 uppercase tracking-widest">
+              <h2 className="text-caption text-content-subtle mb-6 uppercase tracking-widest">
                 {t("footer.connect_title")}
-              </h3>
+              </h2>
               <div className="flex flex-col gap-3">
                 <a
                   href={`mailto:${personalData.email}`}
