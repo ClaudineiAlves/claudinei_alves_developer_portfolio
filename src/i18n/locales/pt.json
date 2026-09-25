@@ -207,7 +207,8 @@
       "send": "Enviar Mensagem",
       "sending": "Enviando...",
       "success": "Mensagem enviada com sucesso!",
-      "error": "Ocorreu um erro inesperado. Tente novamente."
+      "error": "Ocorreu um erro inesperado. Tente novamente.",
+      "error_fallback": "Se preferir, escreva direto para"
     },
     "direct_title": "Contato Direto",
     "social_title": "Redes Sociais",

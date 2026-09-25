@@ -16,6 +16,8 @@ declare global {
   }
 }
 
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_EMAIL || "";
+
 export default function ContactForm() {
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,32 +141,51 @@ export default function ContactForm() {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full py-3 px-6 rounded-xl bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 disabled:cursor-not-allowed transition-all text-white font-medium flex items-center justify-center gap-2"
-      >
-        {isSubmitting ? (
-          <>
-            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            {t("contact.form.sending")}
-          </>
-        ) : (
-          t("contact.form.send")
-        )}
-      </button>
+      {/* Os avisos ficam em regiões vivas sempre montadas, para o leitor de tela anunciar o resultado */}
+      <div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-3 px-6 rounded-xl bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 disabled:cursor-not-allowed transition-all text-white font-medium flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <>
+              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              {t("contact.form.sending")}
+            </>
+          ) : (
+            t("contact.form.send")
+          )}
+        </button>
 
-      {status === "success" && (
-        <p className="text-sm text-green-400 text-center">
-          {t("contact.form.success")}
-        </p>
-      )}
+        <div role="status">
+          {status === "success" && (
+            <p className="mt-6 text-sm text-green-400 text-center">
+              {t("contact.form.success")}
+            </p>
+          )}
+        </div>
 
-      {status === "error" && (
-        <p className="text-sm text-red-400 text-center">
-          {t("contact.form.error")}
-        </p>
-      )}
+        <div role="alert">
+          {status === "error" && (
+            <p className="mt-6 text-sm text-red-400 text-center">
+              {t("contact.form.error")}
+              {CONTACT_EMAIL && (
+                <>
+                  {" "}
+                  {t("contact.form.error_fallback")}{" "}
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="underline hover:text-red-300"
+                  >
+                    {CONTACT_EMAIL}
+                  </a>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
     </form>
   );
 }
