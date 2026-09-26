@@ -22,6 +22,7 @@ function About() {
 
     const split = new SplitText(".about-description", {
       type: "lines,words",
+      aria: "hidden",
       linesClass: "overflow-hidden",
     });
 
@@ -90,9 +91,14 @@ function About() {
               </div>
 
               {/* Descrição com animação SplitText mantida */}
-              <div className="about-description text-body-large text-content-secondary leading-relaxed text-justify space-y-4 font-medium italic">
+              <div
+                className="about-description text-body-large text-content-secondary leading-relaxed text-justify space-y-4 font-medium italic"
+                aria-hidden="true"
+              >
                 {description}
               </div>
+              {/* Cópia para leitor de tela: o SplitText quebra o texto em palavras soltas */}
+              <p className="sr-only">{description}</p>
 
               {/* Barra lateral decorativa */}
               <div className="absolute w-1 h-20 bg-gradient-to-b from-primary-600 to-transparent left-0 top-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />

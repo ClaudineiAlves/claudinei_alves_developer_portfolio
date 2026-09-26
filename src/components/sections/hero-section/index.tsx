@@ -96,7 +96,7 @@ const HeroSection = () => {
         });
 
         el.textContent = titles[index];
-        const split = new SplitText(el, { type: "chars" });
+        const split = new SplitText(el, { type: "chars", aria: "hidden" });
 
         tl.from(split.chars, {
           opacity: 0,
@@ -310,12 +310,15 @@ const HeroSection = () => {
                 </strong>
                 , {t("hero.intro_connector")}
               </span>
+              {/* O cargo gira animado; o leitor de tela recebe só o cargo principal */}
               <span
                 className="text-primary-500 ml-2 font-bold inline-block sm:min-w-[250px] text-glow"
                 ref={designationRef}
+                aria-hidden="true"
               >
                 {designation}
               </span>
+              <span className="sr-only"> {designation}</span>
               <div className="mt-4 text-body-large text-content-muted">
                 <TypeWriter
                   text={t("hero.description")}

@@ -267,9 +267,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-bg-primary text-content-primary min-h-screen`}
       >
         <RegisterSW />
-        <SkipLink />
         <RecaptchaProvider>
           <LanguageProvider initialLocale={serverLocale}>
+            {/* Primeiro elemento focável da página; dentro do provider para seguir o idioma */}
+            <SkipLink />
             <div className="relative flex min-h-screen flex-col">
               <Navbar />
               <main id="main-content" className="flex-1">

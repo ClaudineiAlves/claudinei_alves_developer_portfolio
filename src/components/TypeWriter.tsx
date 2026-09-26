@@ -47,12 +47,16 @@ export default function TypeWriter({
     }
   }, [displayText, isTyping, text, speed, onComplete]);
 
+  // O leitor de tela lê o texto inteiro de uma vez, não a digitação letra a letra
   return (
     <span className={className}>
-      {displayText}
-      {showCursor && cursor && (
-        <span className="animate-pulse text-primary-500">|</span>
-      )}
+      <span aria-hidden="true">
+        {displayText}
+        {showCursor && cursor && (
+          <span className="animate-pulse text-primary-500">|</span>
+        )}
+      </span>
+      <span className="sr-only">{text}</span>
     </span>
   );
 }
