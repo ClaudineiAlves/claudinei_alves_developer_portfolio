@@ -50,5 +50,13 @@
     "*.{js,ts,tsx,css,md,json}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "next": {
+      "postcss": "^8.5.23"
+    },
+    "@serwist/next": {
+      "browserslist": "^4.28.7"
+    }
   }
 }
