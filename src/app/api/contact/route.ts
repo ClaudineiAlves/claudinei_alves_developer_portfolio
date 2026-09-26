@@ -53,6 +53,18 @@ function getClientIp(request: NextRequest): string {
   return request.headers.get("x-real-ip") || "unknown";
 }
 
+// Valores colados no painel da Vercel às vezes vêm com espaço ou quebra de linha:
+// passam no teste de "não vazio", mas o EmailJS os descarta e responde como se a
+// chave não tivesse sido enviada.
+function envLimpa(nome: string): string | undefined {
+  const bruto = process.env[nome];
+  const limpo = bruto?.trim();
+  if (bruto && limpo !== bruto) {
+    console.warn(`[API /contact] ${nome} tinha espaços em volta; removidos`);
+  }
+  return limpo || undefined;
+}
+
 async function verifyRecaptcha(token: string): Promise<boolean> {
   try {
     const response = await fetch(
@@ -119,14 +131,16 @@ export async function POST(request: NextRequest) {
     //   user_id     = Public Key  (o SDK oficial envia exatamente isso)
     //   accessToken = Private Key (obrigatório em chamadas fora do browser)
     // Aceita EMAILJS_PUBLIC_KEY ou o nome legado NEXT_PUBLIC_EMAILJS_PUBLIC_KEY.
+    const serviceId = envLimpa("EMAILJS_SERVICE_ID");
+    const templateId = envLimpa("EMAILJS_TEMPLATE_ID");
     const publicKey =
-      process.env.EMAILJS_PUBLIC_KEY ||
-      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-    const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+      envLimpa("EMAILJS_PUBLIC_KEY") ||
+      envLimpa("NEXT_PUBLIC_EMAILJS_PUBLIC_KEY");
+    const privateKey = envLimpa("EMAILJS_PRIVATE_KEY");
 
     const missing = [
-      !process.env.EMAILJS_SERVICE_ID && "EMAILJS_SERVICE_ID",
-      !process.env.EMAILJS_TEMPLATE_ID && "EMAILJS_TEMPLATE_ID",
+      !serviceId && "EMAILJS_SERVICE_ID",
+      !templateId && "EMAILJS_TEMPLATE_ID",
       !publicKey && "EMAILJS_PUBLIC_KEY",
       !privateKey && "EMAILJS_PRIVATE_KEY",
     ].filter(Boolean);
@@ -147,8 +161,8 @@ export async function POST(request: NextRequest) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_TEMPLATE_ID,
+          service_id: serviceId,
+          template_id: templateId,
           user_id: publicKey,
           accessToken: privateKey,
           template_params: {
@@ -163,7 +177,7 @@ export async function POST(request: NextRequest) {
 
     if (!emailjsResponse.ok) {
       const errorData = await emailjsResponse.text();
-      console.error("[EmailJS] Erro:", errorData);
+      console.error("[EmailJS] Erro:", emailjsResponse.status, errorData);
       return NextResponse.json(
         { error: "Erro ao enviar email" },
         { status: 500 },
