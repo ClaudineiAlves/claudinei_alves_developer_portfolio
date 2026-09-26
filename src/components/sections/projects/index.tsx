@@ -60,7 +60,7 @@ const Projects = () => {
           </div>
 
           {/* Grid de Projetos */}
-          <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 w-full">
             {displayedProjects.map((project, index) => (
               <RevealText key={project.id} delay={400 + index * 100}>
                 <ProjectCard project={project} />
