@@ -158,8 +158,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </CardContent>
         </div>
 
-        <CardFooter className="p-6 pt-2 flex gap-4">
-          <Link href={project.demo || "#"} target="_blank" className="flex-1">
+        {/* Os botões quebram de linha quando o card fica estreito (celular, zoom de 400%) */}
+        <CardFooter className="p-6 pt-2 flex flex-wrap gap-4">
+          <Link
+            href={project.demo || "#"}
+            target="_blank"
+            className="flex-1 basis-auto"
+          >
             <Button
               className={`w-full h-11 rounded-xl text-caption font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 ${
                 project.demo
@@ -172,7 +177,11 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               {t("projects.demo")}
             </Button>
           </Link>
-          <Link href={project.code || "#"} target="_blank" className="flex-1">
+          <Link
+            href={project.code || "#"}
+            target="_blank"
+            className="flex-1 basis-auto"
+          >
             <Button
               className={`w-full h-11 rounded-xl text-caption font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 ${
                 project.code
