@@ -123,7 +123,7 @@
       },
       "4": {
         "name": "Skin Analyser — AI Skin Lesion Triage",
-        "description": "Classification pipeline for dermoscopic images from the public HAM10000 dataset: OpenCV preprocessing, lesion-level splits with no data leakage, 8 CNN architectures compared with transfer learning, and evaluation by F1, recall, AUC and confusion matrix. A triage project: it does not diagnose.",
+        "description": "Classification pipeline for dermoscopic images from the public HAM10000 dataset: OpenCV preprocessing, lesion-level splits with no data leakage, 8 CNN architectures compared with transfer learning, and evaluation by F1, recall, AUC and confusion matrix. Best result on the lesion-level test set: ResNet50, with 73% recall and 0.85 AUC for melanoma. A triage project: it does not diagnose.",
         "role": "Machine Learning Developer",
         "highlight_1": "Train, validation and test sets split by lesion (lesion_id) with class stratification: photos of the same lesion never land in different partitions.",
         "highlight_2": "8 architectures (MobileNetV2, EfficientNetB0, ResNet50, InceptionV3, DenseNet121, Xception, VGG19 and NASNetMobile) compared under an identical protocol, in a parameterized pipeline where only the configuration changes.",
