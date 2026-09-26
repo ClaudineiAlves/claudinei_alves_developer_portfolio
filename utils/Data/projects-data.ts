@@ -137,7 +137,7 @@ const allProjects = [
     published: true,
     name: "Skin Analyser — Triagem de Lesões Cutâneas com IA",
     description:
-      "Pipeline de classificação de imagens dermatoscópicas do dataset público HAM10000: pré-processamento com OpenCV, separação por lesão sem vazamento de dados, 8 arquiteturas de CNN comparadas em transfer learning e avaliação por F1, recall, AUC e matriz de confusão. Projeto de triagem: não faz diagnóstico.",
+      "Pipeline de classificação de imagens dermatoscópicas do dataset público HAM10000: pré-processamento com OpenCV, separação por lesão sem vazamento de dados, 8 arquiteturas de CNN comparadas em transfer learning e avaliação por F1, recall, AUC e matriz de confusão. Melhor resultado no teste separado por lesão: ResNet50, com recall de 73% e AUC de 0,85 em melanoma. Projeto de triagem: não faz diagnóstico.",
 
     tools: [
       "Python",
