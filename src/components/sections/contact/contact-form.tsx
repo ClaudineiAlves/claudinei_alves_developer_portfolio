@@ -43,6 +43,9 @@ export default function ContactForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (isSubmitting) return;
+    // O React zera e.currentTarget ao fim do evento, antes do primeiro await terminar
+    const form = e.currentTarget;
     setIsSubmitting(true);
     setStatus("idle");
 
@@ -54,7 +57,7 @@ export default function ContactForm() {
         return;
       }
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const data = {
         name: formData.get("name") as string,
         email: formData.get("email") as string,
@@ -72,7 +75,7 @@ export default function ContactForm() {
 
       if (response.ok) {
         setStatus("success");
-        e.currentTarget.reset();
+        form.reset();
       } else {
         setStatus("error");
       }
@@ -145,8 +148,10 @@ export default function ContactForm() {
       <div>
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full py-3 px-6 rounded-xl bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 disabled:cursor-not-allowed transition-all text-white font-medium flex items-center justify-center gap-2"
+          // aria-disabled em vez de disabled: um botão desabilitado perde o foco
+          // no meio do envio e o leitor de tela volta para o topo da página
+          aria-disabled={isSubmitting}
+          className="w-full py-3 px-6 rounded-xl bg-primary-600 hover:bg-primary-500 aria-disabled:bg-primary-600/50 aria-disabled:cursor-not-allowed transition-all text-white font-medium flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
@@ -158,12 +163,18 @@ export default function ContactForm() {
           )}
         </button>
 
-        <div role="status">
-          {status === "success" && (
-            <p className="mt-6 text-sm text-green-400 text-center">
-              {t("contact.form.success")}
-            </p>
-          )}
+        {/* aria-live num <div>, com o texto direto dentro: o Orca trata role="status"
+            como texto de interface e não o anuncia, e um <p> filho criado na hora chega
+            na mesma rajada de eventos do reset e é descartado */}
+        <div
+          aria-live="polite"
+          className={
+            status === "success"
+              ? "mt-6 text-sm text-green-400 text-center"
+              : undefined
+          }
+        >
+          {status === "success" ? t("contact.form.success") : ""}
         </div>
 
         <div role="alert">
