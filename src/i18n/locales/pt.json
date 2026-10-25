@@ -226,7 +226,8 @@
     "nav_title": "Navegação",
     "connect_title": "Conecte-se comigo",
     "rights": "Todos os direitos reservados.",
-    "made_with": "Feito no Brasil"
+    "made_with": "Feito no Brasil",
+    "privacy": "Privacidade"
   },
   "project_detail": {
     "back": "Voltar para Projetos",
@@ -267,5 +268,19 @@
     "large_text": "Texto grande",
     "reduced_motion": "Reduzir animações",
     "skip_link": "Pular para o conteúdo principal"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "updated": "Última atualização: 25 de outubro de 2026",
+    "intro": "Esta política explica como são tratados os dados neste portfólio e no job-hunter, um aplicativo pessoal que uso para organizar candidaturas a vagas.",
+    "site_title": "Este site",
+    "site_body": "O site não usa cookies de rastreamento nem cria contas. Quando você envia o formulário de contato, seu nome, e-mail e mensagem são enviados a mim por e-mail através do EmailJS, e o Google reCAPTCHA v3 avalia se o envio é automatizado. Esses dados servem apenas para responder ao seu contato e não são vendidos nem compartilhados.",
+    "app_title": "Aplicativo job-hunter (acesso ao Gmail)",
+    "app_body": "O job-hunter é de uso exclusivamente pessoal e só acessa a minha própria conta do Google. Ele usa a permissão de leitura do Gmail (gmail.readonly) apenas para ler e-mails de alerta de vagas do LinkedIn e do Indeed e extrair título, empresa, local e link da vaga. Nenhum e-mail é alterado, enviado ou apagado. Os dados ficam no meu computador, não são compartilhados com terceiros nem usados para publicidade ou para treinar modelos de IA.",
+    "limited_use": "O uso de informações recebidas das APIs do Google segue a Política de Dados do Usuário dos Serviços de API do Google, incluindo os requisitos de Uso Limitado.",
+    "revoke": "O acesso pode ser revogado a qualquer momento em myaccount.google.com/permissions.",
+    "contact_title": "Contato",
+    "contact_body": "Dúvidas sobre esta política: alvesreis.dev@gmail.com.",
+    "back": "Voltar ao início"
   }
 }

@@ -226,7 +226,8 @@
     "nav_title": "Navigation",
     "connect_title": "Connect With Me",
     "rights": "All rights reserved.",
-    "made_with": "Made in Brazil"
+    "made_with": "Made in Brazil",
+    "privacy": "Privacy"
   },
   "project_detail": {
     "back": "Back to Projects",
@@ -267,5 +268,19 @@
     "large_text": "Large text",
     "reduced_motion": "Reduce animations",
     "skip_link": "Skip to main content"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: October 25, 2026",
+    "intro": "This policy explains how data is handled on this portfolio and in job-hunter, a personal application I use to organize job applications.",
+    "site_title": "This website",
+    "site_body": "The site does not use tracking cookies or create accounts. When you submit the contact form, your name, email and message are sent to me by email through EmailJS, and Google reCAPTCHA v3 checks whether the submission is automated. This data is used only to reply to you and is never sold or shared.",
+    "app_title": "job-hunter application (Gmail access)",
+    "app_body": "job-hunter is for personal use only and accesses only my own Google account. It uses the Gmail read-only permission (gmail.readonly) solely to read LinkedIn and Indeed job alert emails and extract the job title, company, location and link. No email is modified, sent or deleted. The data stays on my computer and is not shared with third parties or used for advertising or to train AI models.",
+    "limited_use": "Use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.",
+    "revoke": "Access can be revoked at any time at myaccount.google.com/permissions.",
+    "contact_title": "Contact",
+    "contact_body": "Questions about this policy: alvesreis.dev@gmail.com.",
+    "back": "Back to home"
   }
 }

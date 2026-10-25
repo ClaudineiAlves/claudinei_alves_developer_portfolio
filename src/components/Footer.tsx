@@ -119,7 +119,13 @@ const Footer = () => {
           <p>
             &copy;{" "}
             <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
-            Claudinei Alves. {t("footer.rights")}
+            Claudinei Alves. {t("footer.rights")}{" "}
+            <Link
+              href="/privacy"
+              className="underline underline-offset-4 transition-colors hover:text-content-primary"
+            >
+              {t("footer.privacy")}
+            </Link>
           </p>
           <p className="flex items-center gap-2">
             {t("footer.made_with")}{" "}
