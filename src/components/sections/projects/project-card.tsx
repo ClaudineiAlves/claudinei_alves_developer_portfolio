@@ -16,7 +16,7 @@ import { MouseEvent, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   const [showAllTags, setShowAllTags] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isNew, setIsNew] = useState(false);
@@ -116,7 +116,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
           <CardHeader className="p-6 pb-2">
             <Link
-              href={`/projects/${project.id}`}
+              href={localePath(`/projects/${project.id}/`)}
               className="group/title inline-block"
             >
               <CardTitle className="text-xl font-bold text-content-primary group-hover/title:text-primary-400 transition-colors flex items-center gap-2 tracking-tight">

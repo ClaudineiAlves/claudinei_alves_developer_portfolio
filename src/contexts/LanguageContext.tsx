@@ -9,12 +9,21 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { Locale, defaultLocale, locales } from "@/i18n";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Locale,
+  LOCALE_COOKIE,
+  locales,
+  localizePath,
+  stripLocale,
+} from "@/i18n";
 
 interface LanguageContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string) => string;
+  /** Prefixa um caminho interno com o idioma atual: "/projects/" → "/pt/projects/" */
+  localePath: (path: string) => string;
   isReady: boolean;
 }
 
@@ -22,43 +31,20 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined,
 );
 
-const VALID_LOCALES: readonly string[] = ["en", "pt"];
-
-function sanitizeLocale(value: unknown): Locale {
-  if (typeof value === "string" && VALID_LOCALES.includes(value)) {
-    return value as Locale;
-  }
-  return defaultLocale;
-}
-
-function setClientCookie(name: string, value: string, days = 365): void {
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-
+// Lido pelo middleware para mandar quem já escolheu PT direto para /pt/…
+function setLocaleCookie(value: Locale, days = 365): void {
   const cookieParts = [
-    `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
-    `expires=${date.toUTCString()}`,
+    `${LOCALE_COOKIE}=${value}`,
+    `max-age=${days * 24 * 60 * 60}`,
     `path=/`,
     `SameSite=Lax`,
   ];
 
-  if (typeof window !== "undefined" && window.location.protocol === "https:") {
+  if (window.location.protocol === "https:") {
     cookieParts.push("Secure");
   }
 
   document.cookie = cookieParts.join(";");
-}
-
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null;
-
-  const match = document.cookie.match(
-    new RegExp(
-      `(?:^|; )${encodeURIComponent(name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`,
-    ),
-  );
-
-  return match ? decodeURIComponent(match[1]) : null;
 }
 
 function getNestedValue(
@@ -77,73 +63,37 @@ function getNestedValue(
 
 interface LanguageProviderProps {
   children: ReactNode;
-  initialLocale?: Locale;
+  /** Idioma da rota ([locale]); a URL é a fonte da verdade */
+  locale: Locale;
 }
 
-export function LanguageProvider({
-  children,
-  initialLocale = defaultLocale,
-}: LanguageProviderProps) {
-  // Always start with server locale so SSR and initial client render match
-  const [locale, setLocaleState] = useState<Locale>(
-    sanitizeLocale(initialLocale),
-  );
-
+export function LanguageProvider({ children, locale }: LanguageProviderProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Sync to user preference only after hydration is complete
-    try {
-      const savedLocal = localStorage.getItem("portfolio-locale");
-      const savedCookie = getCookie("portfolio-locale");
-
-      const saved = sanitizeLocale(savedLocal || savedCookie);
-
-      if (saved !== locale) {
-        setLocaleState(saved);
-        document.documentElement.lang = saved;
-        document.documentElement.setAttribute("data-locale", saved);
-      }
-
-      if (!savedCookie || savedCookie !== saved) {
-        setClientCookie("portfolio-locale", saved);
-      }
-    } catch (error) {
-      console.error("[LanguageProvider] Erro ao inicializar idioma:", error);
-    } finally {
-      setIsReady(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setIsReady(true);
   }, []);
 
   const setLocale = useCallback(
     (newLocale: Locale) => {
-      const sanitized = sanitizeLocale(newLocale);
-
-      if (sanitized === locale) return;
-
-      setLocaleState(sanitized);
+      if (newLocale === locale) return;
 
       try {
-        localStorage.setItem("portfolio-locale", sanitized);
-        setClientCookie("portfolio-locale", sanitized);
-        document.documentElement.lang = sanitized;
-        document.documentElement.setAttribute("data-locale", sanitized);
-
-        fetch("/api/locale", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ locale: sanitized }),
-        }).catch((err) => {
-          console.warn(
-            "[LanguageProvider] Falha ao sync cookie com servidor:",
-            err,
-          );
-        });
+        setLocaleCookie(newLocale);
       } catch (error) {
-        console.error("[LanguageProvider] Erro ao salvar locale:", error);
+        console.error("[LanguageProvider] Erro ao salvar idioma:", error);
       }
+
+      const target = localizePath(stripLocale(pathname), newLocale);
+      router.push(`${target}${window.location.hash}`, { scroll: false });
     },
+    [locale, pathname, router],
+  );
+
+  const localePath = useCallback(
+    (path: string) => localizePath(path, locale),
     [locale],
   );
 
@@ -173,9 +123,10 @@ export function LanguageProvider({
       locale,
       setLocale,
       t,
+      localePath,
       isReady,
     }),
-    [locale, setLocale, t, isReady],
+    [locale, setLocale, t, localePath, isReady],
   );
 
   return (

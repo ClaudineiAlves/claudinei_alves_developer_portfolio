@@ -14,7 +14,7 @@ const SECTIONS = [
 ] as const;
 
 export default function PrivacyPolicy() {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   return (
     <main className="min-h-screen bg-bg-primary px-4 py-24 sm:px-8">
@@ -43,7 +43,7 @@ export default function PrivacyPolicy() {
         ))}
 
         <Link
-          href="/"
+          href={localePath("/")}
           className="inline-flex w-fit items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white transition-all hover:bg-primary-700"
         >
           <ArrowLeft size={20} className="shrink-0" />

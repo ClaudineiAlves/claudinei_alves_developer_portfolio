@@ -4,13 +4,17 @@
  *
  * Checa: páginas do sitemap, canonical/og:url/og:image por página, imagens OG,
  * robots.txt, sitemap, chave do IndexNow, headers de segurança, 404, acesso dos
- * robôs de busca, redirecionamento do domínio antigo, tags de verificação e
- * presença no índice do Bing (informativo).
+ * robôs de busca, redirecionamento do domínio antigo, tags de verificação,
+ * idioma (lang + hreflang) e presença nos índices do Bing e do Google.
  *
  * Uso: `npm run check:site`  (SITE_URL=https://... para outro host)
+ *
+ * Google: precisa de GSC_SERVICE_ACCOUNT com o JSON de uma conta de serviço
+ * adicionada como usuário da propriedade no Search Console. Sem ela, só avisa.
  * Sai com código 1 se houver alguma falha (✗). Avisos (⚠) não falham.
  */
 
+import { createSign } from "node:crypto";
 import { appendFile, readFile } from "node:fs/promises";
 
 const SITE = (
@@ -49,6 +53,17 @@ async function get(url, { ua = BROWSER_UA, method = "GET" } = {}) {
   } catch (err) {
     return { res: null, body: "", ms: Date.now() - start, error: err.message };
   }
+}
+
+// hreflang se repete entre páginas; consulta cada URL uma vez só
+const statusCache = new Map();
+function statusOf(url) {
+  if (!statusCache.has(url))
+    statusCache.set(
+      url,
+      get(url, { method: "HEAD" }).then(({ res }) => res?.status),
+    );
+  return statusCache.get(url);
 }
 
 const meta = (html, attr, name) =>
@@ -92,12 +107,23 @@ async function checkPage(url, ogImages) {
   const ogImage = meta(body, "property", "og:image");
   if (!ogImage) problems.push("sem og:image");
   else ogImages.add(ogImage);
-  for (const [, href] of body.matchAll(
-    /<link rel="alternate" hrefLang="[^"]+" href="([^"]+)"/gi,
-  )) {
-    const alt = await get(href, { method: "HEAD" });
-    if (alt.res?.status !== 200)
-      problems.push(`hreflang ${href} → ${alt.res?.status}`);
+
+  const expectedLang = path.startsWith("/pt/") ? "pt-BR" : "en";
+  const lang = body.match(/<html[^>]*\slang="([^"]+)"/)?.[1];
+  if (lang !== expectedLang)
+    problems.push(`lang=${lang} (esperado ${expectedLang})`);
+
+  const alternates = [
+    ...body.matchAll(
+      /<link rel="alternate" hrefLang="([^"]+)" href="([^"]+)"/gi,
+    ),
+  ];
+  const langs = alternates.map(([, l]) => l);
+  if (!langs.includes("en") || !langs.includes("pt-BR"))
+    problems.push(`hreflang incompleto (${langs.join(", ") || "nenhum"})`);
+  for (const [, , href] of alternates) {
+    const status = await statusOf(href);
+    if (status !== 200) problems.push(`hreflang ${href} → ${status}`);
   }
 
   if (problems.length) fail("página", `${path}: ${problems.join("; ")}`);
@@ -176,12 +202,15 @@ async function checkHome() {
   )?.[1];
   try {
     const data = JSON.parse(ld ?? "");
-    if (data["@type"] === "Person" && data.alternateName)
+    const nodes = data["@graph"] ?? [data];
+    const person = nodes.find((n) => n["@type"] === "Person");
+    const types = nodes.map((n) => n["@type"]).join(" + ");
+    if (person?.alternateName)
       pass(
         "dados estruturados",
-        `Person (${data.name} / ${data.alternateName})`,
+        `${types} (${person.name} / ${person.alternateName})`,
       );
-    else warn("dados estruturados", "JSON-LD Person sem alternateName");
+    else warn("dados estruturados", "JSON-LD sem Person com alternateName");
   } catch {
     fail("dados estruturados", "JSON-LD ausente ou inválido");
   }
@@ -236,6 +265,93 @@ async function checkBingIndex() {
   else warn("índice", `Bing: nenhum resultado para site:${host} ainda`);
 }
 
+// ─── Google Search Console (URL Inspection API) ─────────────────────────────
+
+async function googleAccessToken(account) {
+  const now = Math.floor(Date.now() / 1000);
+  const encode = (obj) =>
+    Buffer.from(JSON.stringify(obj)).toString("base64url");
+  const unsigned = `${encode({ alg: "RS256", typ: "JWT" })}.${encode({
+    iss: account.client_email,
+    scope: "https://www.googleapis.com/auth/webmasters.readonly",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: now,
+    exp: now + 3600,
+  })}`;
+  const signature = createSign("RSA-SHA256")
+    .update(unsigned)
+    .sign(account.private_key)
+    .toString("base64url");
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: `${unsigned}.${signature}`,
+    }),
+    signal: AbortSignal.timeout(20000),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok)
+    throw new Error(`token: HTTP ${res.status} ${json.error ?? ""}`.trim());
+  return json.access_token;
+}
+
+async function checkGoogleIndex(urls) {
+  const raw = process.env.GSC_SERVICE_ACCOUNT;
+  if (!raw)
+    return warn(
+      "google",
+      "GSC_SERVICE_ACCOUNT não configurado — indexação no Google não verificada",
+    );
+
+  let token;
+  try {
+    token = await googleAccessToken(JSON.parse(raw));
+  } catch (err) {
+    return warn("google", `não foi possível autenticar: ${err.message}`);
+  }
+
+  let indexed = 0;
+  for (const url of urls) {
+    const path = url.replace(SITE, "") || "/";
+    const res = await fetch(
+      "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inspectionUrl: url, siteUrl: `${SITE}/` }),
+        signal: AbortSignal.timeout(30000),
+      },
+    ).catch((err) => ({ ok: false, status: err.message, json: () => ({}) }));
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      warn(
+        "google",
+        `${path}: API respondeu ${res.status} ${json.error?.message ?? ""}`.trim(),
+      );
+      continue;
+    }
+    const status = json.inspectionResult?.indexStatusResult ?? {};
+    if (status.verdict === "PASS") indexed++;
+    else
+      warn(
+        "google",
+        `${path}: ${status.coverageState ?? status.verdict ?? "sem dados"}`,
+      );
+    if (status.googleCanonical && status.googleCanonical !== url)
+      warn(
+        "google",
+        `${path}: Google escolheu outro canonical (${status.googleCanonical})`,
+      );
+  }
+  if (indexed) pass("google", `${indexed}/${urls.length} páginas indexadas`);
+}
+
 const ICON = { pass: "✓", warn: "⚠", fail: "✗" };
 
 async function report() {
@@ -275,6 +391,7 @@ async function report() {
     checkBots(urls[1] ?? `${SITE}/`),
     checkOldDomain(),
     checkBingIndex(),
+    checkGoogleIndex(urls),
   ]);
   const failures = await report();
   process.exit(failures ? 1 : 0);

@@ -1,4 +1,3 @@
-// src/app/certificado/not-found.tsx
 "use client";
 
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -6,7 +5,7 @@ import { ArrowLeft, Award } from "lucide-react";
 import Link from "next/link";
 
 export default function CertificateNotFound() {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
@@ -23,7 +22,7 @@ export default function CertificateNotFound() {
         </p>
 
         <Link
-          href="/#certificates"
+          href={localePath("/#certificates")}
           className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
         >
           <ArrowLeft size={20} className="shrink-0" />

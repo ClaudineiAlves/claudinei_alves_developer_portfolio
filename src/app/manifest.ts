@@ -13,12 +13,14 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#000000",
     theme_color: "#000000",
 
+    // Sem ícone o navegador não oferece instalar o PWA
     icons: [
-      
-    ],
-
-    screenshots: [
-
+      {
+        src: "/logo.png",
+        sizes: "1024x1024",
+        type: "image/png",
+        purpose: "any",
+      },
     ],
   };
 }

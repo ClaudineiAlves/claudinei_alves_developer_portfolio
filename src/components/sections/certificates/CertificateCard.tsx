@@ -12,11 +12,11 @@ interface CertificateCardProps {
 }
 
 export default function CertificateCard({ certificate }: CertificateCardProps) {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   return (
     <Link
-      href={`/certificado/${certificate.id}`}
+      href={localePath(`/certificado/${certificate.id}/`)}
       className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary rounded-xl"
     >
       <article

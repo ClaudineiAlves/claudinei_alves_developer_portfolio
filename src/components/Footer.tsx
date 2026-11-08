@@ -10,7 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Heart } from "lucide-react";
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   const navItems = [
     { label: t("nav.about"), to: "about" },
@@ -28,7 +28,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
           {/* Brand */}
           <div className="flex flex-col gap-6">
-            <Link href="/" className="w-fit group">
+            <Link href={localePath("/")} className="w-fit group">
               <Image
                 src="/logo.png"
                 alt="Claudinei Alves Logo"
@@ -121,7 +121,7 @@ const Footer = () => {
             <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
             Claudinei Alves. {t("footer.rights")}{" "}
             <Link
-              href="/privacy"
+              href={localePath("/privacy/")}
               className="underline underline-offset-4 transition-colors hover:text-content-primary"
             >
               {t("footer.privacy")}

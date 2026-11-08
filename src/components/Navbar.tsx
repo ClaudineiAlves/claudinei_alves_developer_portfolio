@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Link as ScrollLink } from "react-scroll";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { stripLocale } from "@/i18n";
 
 // Chaves de tradução para cada item da navbar
 const navItemKeys = [
@@ -44,7 +45,7 @@ function LanguageToggle() {
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 const Navbar = () => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
@@ -80,7 +81,7 @@ const Navbar = () => {
 
   const renderLink = (item: { key: string; to: string }, isMobile = false) => {
     const label = t(item.key);
-    const isHomePage = pathname === "/";
+    const isHomePage = stripLocale(pathname) === "/";
 
     const baseClasses = isMobile
       ? "block cursor-pointer py-3 text-lg font-semibold transition-all duration-300 border-b border-bg-tertiary text-content-secondary hover:text-primary-400 hover:pl-2"
@@ -110,7 +111,7 @@ const Navbar = () => {
     return (
       <Link
         key={item.to}
-        href={`/#${item.to}`}
+        href={localePath(`/#${item.to}`)}
         className={`${baseClasses} text-content-secondary hover:text-primary-400`}
         onClick={() => isMobile && setIsMenuOpen(false)}
       >
@@ -133,7 +134,7 @@ const Navbar = () => {
       <div className="container flex items-center justify-between mx-auto px-4 lg:px-8">
         {/* Logo */}
         <Link
-          href="/"
+          href={localePath("/")}
           className="transition-transform duration-300 hover:scale-105"
         >
           <Image

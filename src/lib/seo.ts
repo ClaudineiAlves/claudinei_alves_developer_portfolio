@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { type Locale, localizePath, ogLocale } from "@/i18n";
 
 export const SITE_URL = "https://claudineiportfolio.vercel.app";
 export const SITE_NAME = "Claudinei Alves Portfolio";
@@ -11,8 +12,27 @@ export const OG_IMAGE = {
   type: "image/png",
 };
 
+/**
+ * Canonical da página no idioma atual + hreflang apontando para as duas versões.
+ * `path` é o caminho sem prefixo de idioma e com barra final (trailingSlash: true).
+ */
+export function alternatesFor(
+  locale: Locale,
+  path: string,
+): NonNullable<Metadata["alternates"]> {
+  return {
+    canonical: localizePath(path, locale),
+    languages: {
+      en: localizePath(path, "en"),
+      "pt-BR": localizePath(path, "pt"),
+      "x-default": localizePath(path, "en"),
+    },
+  };
+}
+
 interface PageSeoInput {
-  /** Caminho com barra final (trailingSlash: true), ex.: "/projects/1/" */
+  locale: Locale;
+  /** Caminho sem prefixo de idioma, com barra final, ex.: "/projects/1/" */
   path: string;
   title: string;
   description?: string;
@@ -21,6 +41,7 @@ interface PageSeoInput {
 // openGraph e twitter de um segmento substituem os do pai por inteiro (não há
 // merge), então cada página precisa repetir imagem e siteName.
 export function pageSeo({
+  locale,
   path,
   title,
   description,
@@ -28,12 +49,13 @@ export function pageSeo({
   const fullTitle = `${title} | Claudinei Alves`;
 
   return {
-    alternates: { canonical: path },
+    alternates: alternatesFor(locale, path),
     openGraph: {
       title: fullTitle,
       description,
-      url: path,
+      url: localizePath(path, locale),
       siteName: SITE_NAME,
+      locale: ogLocale[locale],
       images: [OG_IMAGE],
       type: "website",
     },
