@@ -1,24 +1,25 @@
 import { projectsData } from "@/../utils/Data/projects-data";
-import { locales } from "@/i18n";
+import { isLocale, locales } from "@/i18n";
 import { pageSeo } from "@/lib/seo";
 import ProjectDetails from "@/components/sections/projects/project-details";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 };
+
+export function generateStaticParams() {
+  return projectsData.map((project) => ({ id: String(project.id) }));
+}
 
 // Título próprio por projeto; o template "%s | Claudinei Alves" de projects/layout completa
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { locale: rawLocale, id } = await params;
   const project = projectsData.find((p) => p.id === parseInt(id));
   if (!project) return {};
 
-  const cookieStore = await cookies();
-  const locale =
-    cookieStore.get("portfolio-locale")?.value === "pt" ? "pt" : "en";
+  const locale = isLocale(rawLocale) ? rawLocale : "en";
   const items = locales[locale].projects.items as Record<
     string,
     { name?: string; description?: string }
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    ...pageSeo({ path: `/projects/${id}/`, title, description }),
+    ...pageSeo({ locale, path: `/projects/${id}/`, title, description }),
   };
 }
 

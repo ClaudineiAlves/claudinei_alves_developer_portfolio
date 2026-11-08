@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import { locales } from "@/i18n";
+import { isLocale, locales } from "@/i18n";
 import { pageSeo } from "@/lib/seo";
 
 // page.tsx é client component e não pode exportar metadata
-export async function generateMetadata(): Promise<Metadata> {
-  const cookieStore = await cookies();
-  const locale =
-    cookieStore.get("portfolio-locale")?.value === "pt" ? "pt" : "en";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : "en";
 
   const title = locales[locale].nav.projects;
   const description = locales[locale].projects.subtitle;
@@ -20,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: "%s | Claudinei Alves",
     },
     description,
-    ...pageSeo({ path: "/projects/", title, description }),
+    ...pageSeo({ locale, path: "/projects/", title, description }),
   };
 }
 

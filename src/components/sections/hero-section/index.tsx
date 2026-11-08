@@ -18,7 +18,7 @@ import TypeWriter from "@/components/TypeWriter";
 const indent = (level: number) => ({ paddingLeft: `${level * 2}ch` });
 
 const HeroSection = () => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   const isTouch = useIsTouchDevice();
   const { designation, designationAlternateWords } = usePersonalData();
 
@@ -352,7 +352,7 @@ const HeroSection = () => {
 
             <div className="hero-cta flex flex-col sm:flex-row sm:flex-wrap gap-4 w-full">
               <Link
-                href="/#contact"
+                href={localePath("/#contact")}
                 className="btn-primary group flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <span className="relative flex items-center gap-2">

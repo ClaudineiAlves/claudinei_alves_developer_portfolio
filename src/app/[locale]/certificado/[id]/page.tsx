@@ -1,12 +1,13 @@
-// src/app/certificado/[id]/page.tsx
 import CertificateDetails from "@/components/sections/certificates/certificate-details";
 import { certificates } from "@/components/sections/certificates/data";
 import { Metadata } from "next";
 import { pageSeo } from "@/lib/seo";
+import { isLocale, locales } from "@/i18n";
 import { notFound } from "next/navigation";
 
 interface CertificatePageProps {
   params: Promise<{
+    locale: string;
     id: string;
   }>;
 }
@@ -15,25 +16,26 @@ interface CertificatePageProps {
 export async function generateMetadata({
   params,
 }: CertificatePageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { locale: rawLocale, id } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : "en";
+  const dict = locales[locale];
   const certificate = certificates.find((c) => c.id === id);
 
   if (!certificate) {
-    return {
-      title: "Certificado não encontrado",
-    };
+    return { title: dict.certificate_detail.not_found_title };
   }
 
-  const title = `${certificate.title} | Certificado`;
+  const items = dict.certificates.items as Record<
+    string,
+    { title?: string; description?: string }
+  >;
+  const title = `${items[id]?.title || certificate.title} | ${dict.certificate_detail.meta_label}`;
+  const description = items[id]?.description || certificate.description;
 
   return {
     title,
-    description: certificate.description,
-    ...pageSeo({
-      path: `/certificado/${id}/`,
-      title,
-      description: certificate.description,
-    }),
+    description,
+    ...pageSeo({ locale, path: `/certificado/${id}/`, title, description }),
   };
 }
 

@@ -24,7 +24,7 @@ export default function CertificateDetails({
   certificate,
   relatedCertificates,
 }: CertificateDetailsProps) {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
@@ -32,7 +32,7 @@ export default function CertificateDetails({
         {/* Breadcrumb */}
         <nav className="mb-8">
           <Link
-            href="/#certificates"
+            href={localePath("/#certificates")}
             className="inline-flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors"
           >
             <ArrowLeft size={20} className="shrink-0" />
@@ -178,7 +178,10 @@ export default function CertificateDetails({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedCertificates.map((cert) => (
-                <Link key={cert.id} href={`/certificado/${cert.id}`}>
+                <Link
+                  key={cert.id}
+                  href={localePath(`/certificado/${cert.id}/`)}
+                >
                   <div className="group bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] border border-[#333] hover:border-red-500/50 rounded-xl overflow-hidden transition-all duration-300 hover:transform hover:scale-105">
                     <div className="relative h-40 overflow-hidden">
                       <Image

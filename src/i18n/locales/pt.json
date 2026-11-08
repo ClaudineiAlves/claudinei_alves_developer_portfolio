@@ -259,7 +259,8 @@
     "id_label": "ID do Certificado",
     "related_title": "Certificados Relacionados",
     "not_found_title": "Certificado não encontrado",
-    "not_found_description": "O certificado que você está procurando não existe ou foi removido."
+    "not_found_description": "O certificado que você está procurando não existe ou foi removido.",
+    "meta_label": "Certificado"
   },
   "accessibility": {
     "title": "Acessibilidade",
@@ -281,6 +282,12 @@
     "revoke": "O acesso pode ser revogado a qualquer momento em myaccount.google.com/permissions.",
     "contact_title": "Contato",
     "contact_body": "Dúvidas sobre esta política: alvesreis.dev@gmail.com.",
+    "back": "Voltar ao início",
+    "meta_description": "Como os dados são tratados neste portfólio e no app pessoal job-hunter."
+  },
+  "not_found": {
+    "title": "Página não encontrada",
+    "description": "A página que você procura não existe ou foi movida.",
     "back": "Voltar ao início"
   }
 }

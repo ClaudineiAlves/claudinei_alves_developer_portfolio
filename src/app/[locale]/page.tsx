@@ -7,13 +7,20 @@ import Certificates from "@/components/sections/certificates";
 import SectionReveal from "@/components/SectionReveal";
 import Education from "@/components/sections/education";
 
-import "./css/card.css";
+import "../css/card.css";
 
 import type { Metadata } from "next";
+import { isLocale } from "@/i18n";
+import { alternatesFor } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: alternatesFor(isLocale(locale) ? locale : "en", "/") };
+}
 
 // ✅ Descomente quando a seção Experience estiver pronta:
 // import Experience from "@/components/sections/experience";

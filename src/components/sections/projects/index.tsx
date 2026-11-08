@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import RevealText from "@/components/RevealText";
 
 const Projects = () => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   const projectsData = useProjects();
   const displayedProjects = projectsData.slice(0, 3);
 
@@ -70,7 +70,7 @@ const Projects = () => {
 
           {/* Botão Ver Todos */}
           <RevealText delay={700}>
-            <Link href="/projects" className="group mt-8">
+            <Link href={localePath("/projects/")} className="group mt-8">
               <button className="btn-primary flex items-center gap-2 group/btn">
                 <span className="relative flex items-center gap-2">
                   {t("projects.view_all")}

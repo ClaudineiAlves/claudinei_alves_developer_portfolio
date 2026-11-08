@@ -32,7 +32,7 @@ interface ProjectDetailsProps {
 }
 
 const ProjectDetails = ({ project: rawProject }: ProjectDetailsProps) => {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   // O servidor entrega o projeto cru (em PT); o texto no idioma ativo vem do contexto.
   const project: Project =
     useProjects().find((p) => p.id === rawProject.id) ?? rawProject;
@@ -42,7 +42,7 @@ const ProjectDetails = ({ project: rawProject }: ProjectDetailsProps) => {
       <div className="container mx-auto max-w-7xl">
         {/* Back Button */}
         <Link
-          href="/#projects"
+          href={localePath("/#projects")}
           className="inline-flex items-center gap-2 text-white hover:text-red-500 transition-colors mb-8 group font-medium"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -280,7 +280,7 @@ const ProjectDetails = ({ project: rawProject }: ProjectDetailsProps) => {
                 </div>
 
                 <div className="mt-4">
-                  <Link href="/#contact" className="w-full">
+                  <Link href={localePath("/#contact")} className="w-full">
                     <Button className="w-full bg-red-600/10 border border-red-600/20 hover:bg-red-600 hover:text-white py-6 rounded-xl text-red-500 font-bold uppercase tracking-widest text-xs transition-all duration-300 group flex gap-2 overflow-hidden relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <span className="relative z-10 flex items-center justify-center gap-2 w-full">
@@ -306,7 +306,7 @@ const ProjectDetails = ({ project: rawProject }: ProjectDetailsProps) => {
               </p>
             </div>
             <Link
-              href="/#projects"
+              href={localePath("/#projects")}
               className="text-red-500 font-black uppercase tracking-[0.2em] text-sm hover:text-red-400 transition-colors flex items-center gap-2 group shrink-0"
             >
               {t("project_detail.view_all_projects")}{" "}

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 import localFont from "next/font/local";
-import "./globals.css";
+import "../globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/../utils/ScrollToTopButton";
@@ -11,9 +11,17 @@ import AccessibilityToggle from "@/components/AccessibilityToggle";
 import SkipLink from "@/components/SkipLink";
 import { RegisterSW } from "@/components/RegisterSW";
 import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/seo";
+import {
+  type Locale,
+  LOCALES,
+  htmlLang,
+  isLocale,
+  localizePath,
+  ogLocale,
+} from "@/i18n";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
   display: "swap",
@@ -21,25 +29,28 @@ const geistSans = localFont({
 });
 
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
   display: "swap",
   // ✅ Removido: preload: false é o padrão, declaração desnecessária
 });
 
-const VALID_LOCALES = ["en", "pt"] as const;
-type ValidLocale = (typeof VALID_LOCALES)[number];
-const DEFAULT_LOCALE: ValidLocale = "en";
+// Cada idioma é gerado no build. O middleware reescreve as URLs sem prefixo
+// para /en/… internamente, então só "en" e "pt" chegam aqui; o notFound()
+// cobre caminhos fora do middleware (ex.: /arquivo-inexistente.txt).
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }));
+}
 
-function sanitizeLocale(value: unknown): ValidLocale {
-  if (
-    typeof value === "string" &&
-    VALID_LOCALES.includes(value as ValidLocale)
-  ) {
-    return value as ValidLocale;
-  }
-  return DEFAULT_LOCALE;
+interface LocaleParams {
+  params: Promise<{ locale: string }>;
+}
+
+async function resolveLocale(params: LocaleParams["params"]): Promise<Locale> {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  return locale;
 }
 
 const metadataDict = {
@@ -53,7 +64,6 @@ const metadataDict = {
     twitterTitle: "Claudinei Alves Portfolio | Engenheiro de IA",
     twitterDescription:
       "Projetos de Inteligência Artificial, Machine Learning e desenvolvimento web moderno. Portfólio de Claudinei Alves.",
-    locale: "pt_BR",
   },
   en: {
     title: "Claudinei Alves Portfolio | AI Engineer & Data Scientist",
@@ -65,7 +75,6 @@ const metadataDict = {
     twitterTitle: "Claudinei Alves Portfolio | AI Engineer",
     twitterDescription:
       "Projects in Artificial Intelligence, Machine Learning and modern web development. Claudinei Alves Portfolio.",
-    locale: "en_US",
   },
 };
 
@@ -81,10 +90,10 @@ export const viewport: Viewport = {
   colorScheme: "dark light",
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const cookieStore = await cookies();
-  const rawLocale = cookieStore.get("portfolio-locale")?.value;
-  const locale = sanitizeLocale(rawLocale);
+export async function generateMetadata({
+  params,
+}: LocaleParams): Promise<Metadata> {
+  const locale = await resolveLocale(params);
 
   const data = metadataDict[locale];
 
@@ -127,10 +136,10 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: data.ogTitle,
       description: data.ogDescription,
-      url: "/",
+      url: localizePath("/", locale),
       siteName: SITE_NAME,
       images: [OG_IMAGE],
-      locale: data.locale,
+      locale: ogLocale[locale],
       type: "website",
     },
     twitter: {
@@ -152,19 +161,20 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function generateStructuredData(locale: ValidLocale) {
+function generateStructuredData(locale: Locale) {
   const isPt = locale === "pt";
+  const url = `${SITE_URL}${localizePath("/", locale)}`;
 
-  return {
-    "@context": "https://schema.org",
+  const person = {
     "@type": "Person",
+    "@id": `${SITE_URL}/#person`,
     name: "Claudinei Alves",
     // Nome completo usado no GitHub e no LinkedIn
     alternateName: "Claudinei Alves Reis",
     jobTitle: isPt
       ? "Engenheiro de IA & Cientista de Dados"
       : "AI Engineer & Data Scientist",
-    url: "https://claudineiportfolio.vercel.app",
+    url,
     sameAs: [
       "https://github.com/ClaudineiAlves",
       "https://www.linkedin.com/in/claudinei-alves-reis/",
@@ -181,67 +191,44 @@ function generateStructuredData(locale: ValidLocale) {
       "@type": "PostalAddress",
       addressCountry: "BR",
     },
-    worksFor: {
-      "@type": "Organization",
-      name: "Freelancer",
-    },
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      person,
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url,
+        name: SITE_NAME,
+        inLanguage: htmlLang[locale],
+        author: { "@id": `${SITE_URL}/#person` },
+      },
+    ],
   };
 }
 
 export default async function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const rawLocale = cookieStore.get("portfolio-locale")?.value;
-  const serverLocale = sanitizeLocale(rawLocale);
-
-  const structuredData = generateStructuredData(serverLocale);
+  params,
+}: Readonly<{ children: React.ReactNode } & LocaleParams>) {
+  const locale = await resolveLocale(params);
+  const structuredData = generateStructuredData(locale);
 
   return (
     <html
-      lang={serverLocale}
-      data-locale={serverLocale}
+      lang={htmlLang[locale]}
+      data-locale={locale}
       suppressHydrationWarning
       className="dark"
       dir="ltr"
     >
       <head>
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var VALID_LOCALES = ["en","pt"];
-                  var DEFAULT = "${serverLocale}";
-
-                  var saved = localStorage.getItem("portfolio-locale");
-                  var cookieMatch = document.cookie.match(/(?:^|; )portfolio-locale=([^;]*)/);
-                  var cookie = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
-
-                  var locale = saved || cookie || DEFAULT;
-
-                  if (VALID_LOCALES.indexOf(locale) === -1) {
-                    locale = DEFAULT;
-                  }
-
-                  document.documentElement.lang = locale;
-                  document.documentElement.setAttribute("data-locale", locale);
-                } catch(e) {
-                  document.documentElement.lang = "${serverLocale}";
-                  document.documentElement.setAttribute("data-locale", "${serverLocale}");
-                }
-              })();
-            `,
-          }}
-        />
-
-        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
 
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -257,7 +244,7 @@ export default async function RootLayout({
       >
         <RegisterSW />
         <RecaptchaProvider>
-          <LanguageProvider initialLocale={serverLocale}>
+          <LanguageProvider locale={locale}>
             {/* Primeiro elemento focável da página; dentro do provider para seguir o idioma */}
             <SkipLink />
             <div className="relative flex min-h-screen flex-col">

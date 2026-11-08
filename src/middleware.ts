@@ -1,68 +1,40 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { LOCALE_COOKIE } from "@/i18n";
 
-const VALID_LOCALES = ["en", "pt"] as const;
-type ValidLocale = (typeof VALID_LOCALES)[number];
-const DEFAULT_LOCALE: ValidLocale = "en";
-const COOKIE_NAME = "portfolio-locale";
-
-function sanitizeLocale(value: unknown): ValidLocale {
-  if (
-    typeof value === "string" &&
-    VALID_LOCALES.includes(value as ValidLocale)
-  ) {
-    return value as ValidLocale;
-  }
-  return DEFAULT_LOCALE;
-}
-
+// URLs públicas: EN sem prefixo (/projects/1/), PT com /pt (/pt/projects/1/).
+// Internamente as páginas vivem em app/[locale]/, então as URLs sem prefixo
+// são reescritas para /en/… e servidas do HTML gerado no build.
 export function middleware(request: NextRequest) {
-  // ✅ Pula arquivos estáticos e API diretamente no código (mais confiável que regex)
-  const pathname = request.nextUrl.pathname;
-  if (
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico" ||
-    pathname === "/sitemap.xml" ||
-    pathname === "/robots.txt"
-  ) {
+  const { pathname, search } = request.nextUrl;
+
+  // /en/… não é URL pública: redireciona para a versão sem prefixo
+  if (pathname === "/en" || pathname.startsWith("/en/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.slice(3) || "/";
+    return NextResponse.redirect(url, 308);
+  }
+
+  if (pathname === "/pt" || pathname.startsWith("/pt/")) {
     return NextResponse.next();
   }
 
-  const response = NextResponse.next();
-
-  // Headers de segurança obrigatórios
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), payment=()",
-  );
-
-  // ✅ Cookie seguro HttpOnly + Secure + SameSite=Strict
-  const currentLocale = request.cookies.get(COOKIE_NAME)?.value;
-  const sanitizedLocale = sanitizeLocale(currentLocale);
-
-  if (!currentLocale || !VALID_LOCALES.includes(currentLocale as ValidLocale)) {
-    response.cookies.set(COOKIE_NAME, sanitizedLocale, {
-      httpOnly: true,
-      // secure só em produção: em HTTP (teste local pelo IP da rede) o
-      // navegador descartaria o cookie e o idioma não persistiria
-      secure: process.env.NODE_ENV === "production",
-      // Lax, não Strict: com Strict o cookie não é enviado na primeira
-      // navegação vinda de um link externo (LinkedIn, Google), e o visitante
-      // via a página no idioma padrão antes do cliente corrigir
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 365,
-      path: "/",
-    });
+  // Quem escolheu PT no seletor volta direto para /pt/…. Robôs de busca não
+  // mandam cookie, então sempre veem a URL que pediram.
+  if (request.cookies.get(LOCALE_COOKIE)?.value === "pt") {
+    const url = request.nextUrl.clone();
+    url.pathname = `/pt${pathname}`;
+    return NextResponse.redirect(url, 307);
   }
 
-  return response;
+  const url = request.nextUrl.clone();
+  url.pathname = `/en${pathname}`;
+  url.search = search;
+  return NextResponse.rewrite(url);
 }
 
-// ✅ Matcher simplificado — aplica a TUDO, o filtro é feito no código acima
 export const config = {
-  matcher: ["/:path*"],
+  // Tudo menos API, assets do Next e arquivos com extensão (imagens, sitemap,
+  // robots, manifest, sw.js, chave do IndexNow…)
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };
