@@ -28,6 +28,9 @@ jobs:
           node-version: 22
 
       - name: Verificar produção
+        env:
+          # Opcional: JSON da conta de serviço com acesso ao Search Console
+          GSC_SERVICE_ACCOUNT: ${{ secrets.GSC_SERVICE_ACCOUNT }}
         run: node scripts/site-check.mjs
 
       # Depois de um deploy aprovado na verificação, avisa Bing/Yandex/Seznam/Naver
