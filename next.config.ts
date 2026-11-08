@@ -15,6 +15,7 @@ const nextConfig = {
     // ],
   },
   trailingSlash: true,
+  poweredByHeader: false,
 };
 
 const nextConfigFunction = async (phase: string) => {
