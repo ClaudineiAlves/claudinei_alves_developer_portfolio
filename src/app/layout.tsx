@@ -10,6 +10,7 @@ import { RecaptchaProvider } from "@/components/RecaptchaProvider";
 import AccessibilityToggle from "@/components/AccessibilityToggle";
 import SkipLink from "@/components/SkipLink";
 import { RegisterSW } from "@/components/RegisterSW";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -45,7 +46,7 @@ const metadataDict = {
   pt: {
     title: "Claudinei Alves Portfolio | Portfólio de IA & Cientista de Dados",
     description:
-      "Portfolio de Claudinei Alves — Desenvolvedor focado em Inteligência Artificial, Ciência de Dados e Engenharia de Software. Projetos com Python, Machine Learning e análise de dados aplicada a problemas reais. Acesse claudineiportfolio.vercel.app",
+      "Portfolio de Claudinei Alves (Claudinei Alves Reis) — Desenvolvedor focado em Inteligência Artificial, Ciência de Dados e Engenharia de Software. Projetos com Python, Machine Learning e análise de dados aplicada a problemas reais. Acesse claudineiportfolio.vercel.app",
     ogTitle: "Claudinei Alves Portfolio | Portfólio de IA & Ciência de Dados",
     ogDescription:
       "Projetos em Inteligência Artificial, Ciência de Dados e Desenvolvimento de Software focados em resolver problemas reais com tecnologia.",
@@ -57,7 +58,7 @@ const metadataDict = {
   en: {
     title: "Claudinei Alves Portfolio | AI Engineer & Data Scientist",
     description:
-      "Claudinei Alves' Portfolio — Developer focused on Artificial Intelligence, Data Science and Software Engineering. Projects with Python, Machine Learning and data analysis applied to real-world problems. Visit claudineiportfolio.vercel.app",
+      "Claudinei Alves' Portfolio (Claudinei Alves Reis) — Developer focused on Artificial Intelligence, Data Science and Software Engineering. Projects with Python, Machine Learning and data analysis applied to real-world problems. Visit claudineiportfolio.vercel.app",
     ogTitle: "Claudinei Alves Portfolio | AI & Data Science Portfolio",
     ogDescription:
       "Projects in Artificial Intelligence, Data Science and Software Development focused on solving real problems with technology.",
@@ -88,7 +89,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const data = metadataDict[locale];
 
   return {
-    metadataBase: new URL("https://claudineiportfolio.vercel.app"),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: data.title,
       template: "%s | Claudinei Alves",
@@ -96,6 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: data.description,
     keywords: [
       "Claudinei Alves",
+      "Claudinei Alves Reis",
       "AI Engineer",
       "Data Scientist",
       "Machine Learning",
@@ -125,17 +127,9 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: data.ogTitle,
       description: data.ogDescription,
-      url: "https://claudineiportfolio.vercel.app",
-      siteName: "Claudinei Alves Portfolio",
-      images: [
-        {
-          url: "/portfolio-preview.png",
-          width: 1200,
-          height: 630,
-          alt: "Claudinei Alves Portfolio Preview",
-          type: "image/png",
-        },
-      ],
+      url: "/",
+      siteName: SITE_NAME,
+      images: [OG_IMAGE],
       locale: data.locale,
       type: "website",
     },
@@ -143,15 +137,8 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: data.twitterTitle,
       description: data.twitterDescription,
-      images: ["/portfolio-preview.png"],
+      images: [OG_IMAGE.url],
       creator: "@claudinei_alves",
-    },
-    alternates: {
-      canonical: "https://claudineiportfolio.vercel.app",
-      languages: {
-        "pt-BR": "https://claudineiportfolio.vercel.app/pt",
-        "en-US": "https://claudineiportfolio.vercel.app/en",
-      },
     },
     verification: {
       google: "7wqyeqXdmhd8uuXTlIk4Gmu-bNZNeD4yCtUxmg9Hr4Y",
@@ -172,6 +159,8 @@ function generateStructuredData(locale: ValidLocale) {
     "@context": "https://schema.org",
     "@type": "Person",
     name: "Claudinei Alves",
+    // Nome completo usado no GitHub e no LinkedIn
+    alternateName: "Claudinei Alves Reis",
     jobTitle: isPt
       ? "Engenheiro de IA & Cientista de Dados"
       : "AI Engineer & Data Scientist",

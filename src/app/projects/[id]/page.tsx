@@ -1,5 +1,6 @@
 import { projectsData } from "@/../utils/Data/projects-data";
 import { locales } from "@/i18n";
+import { pageSeo } from "@/lib/seo";
 import ProjectDetails from "@/components/sections/projects/project-details";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -23,9 +24,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     { name?: string; description?: string }
   >;
 
+  const title = items[id]?.name || project.name;
+  const description = items[id]?.description || project.description;
+
   return {
-    title: items[id]?.name || project.name,
-    description: items[id]?.description || project.description,
+    title,
+    description,
+    ...pageSeo({ path: `/projects/${id}/`, title, description }),
   };
 }
 

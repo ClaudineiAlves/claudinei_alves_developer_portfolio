@@ -2,6 +2,7 @@
 import CertificateDetails from "@/components/sections/certificates/certificate-details";
 import { certificates } from "@/components/sections/certificates/data";
 import { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import { notFound } from "next/navigation";
 
 interface CertificatePageProps {
@@ -23,9 +24,16 @@ export async function generateMetadata({
     };
   }
 
+  const title = `${certificate.title} | Certificado`;
+
   return {
-    title: `${certificate.title} | Certificado`,
+    title,
     description: certificate.description,
+    ...pageSeo({
+      path: `/certificado/${id}/`,
+      title,
+      description: certificate.description,
+    }),
   };
 }
 

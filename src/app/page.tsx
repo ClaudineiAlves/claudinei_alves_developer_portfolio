@@ -9,6 +9,12 @@ import Education from "@/components/sections/education";
 
 import "./css/card.css";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 // ✅ Descomente quando a seção Experience estiver pronta:
 // import Experience from "@/components/sections/experience";
 
