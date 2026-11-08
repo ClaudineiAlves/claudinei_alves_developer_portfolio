@@ -1,0 +1,36 @@
+name: Verificação do site
+
+on:
+  # Todo dia às 09:00 (horário de Brasília)
+  schedule:
+    - cron: "0 12 * * *"
+  # A Vercel publica um deployment_status no GitHub a cada deploy
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # Em deployment_status, só deploys de produção concluídos
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar produção
+        run: node scripts/site-check.mjs
+
+      # Depois de um deploy aprovado na verificação, avisa Bing/Yandex/Seznam/Naver
+      - name: Enviar URLs ao IndexNow
+        if: github.event_name == 'deployment_status'
+        run: node scripts/indexnow.mjs
