@@ -187,9 +187,13 @@ async function checkHome() {
   if (!h.get("content-security-policy"))
     warn("segurança", "sem Content-Security-Policy");
 
-  const region = h.get("x-vercel-id")?.split("::").slice(-2, -1)[0];
-  if (region && region !== "gru1")
-    warn("desempenho", `função rodando em ${region} (esperado gru1)`);
+  // Páginas são estáticas: devem sair do cache da CDN
+  const cache = h.get("x-vercel-cache");
+  if (cache && !["HIT", "STALE", "PRERENDER"].includes(cache))
+    warn(
+      "desempenho",
+      `home não veio do cache da CDN (x-vercel-cache: ${cache})`,
+    );
 
   if (!meta(body, "name", "google-site-verification"))
     fail("verificação", "meta google-site-verification ausente");
@@ -214,6 +218,24 @@ async function checkHome() {
   } catch {
     fail("dados estruturados", "JSON-LD ausente ou inválido");
   }
+}
+
+// x-vercel-id: "borda::id" quando vem do cache, "borda::função::id" quando
+// executa uma função. A borda é a mais próxima de quem pede (no Actions, EUA),
+// então a região só é lida de uma requisição que de fato roda a função.
+async function checkFunctionRegion() {
+  const res = await fetch(`${SITE}/api/contact/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "User-Agent": BROWSER_UA },
+    body: "{}",
+    signal: AbortSignal.timeout(20000),
+  }).catch(() => null);
+  const parts = res?.headers.get("x-vercel-id")?.split("::") ?? [];
+  if (parts.length < 3) return;
+  const region = parts[1];
+  if (region === "gru1")
+    pass("desempenho", "funções rodando em gru1 (São Paulo)");
+  else warn("desempenho", `funções rodando em ${region} (esperado gru1)`);
 }
 
 async function checkNotFound() {
@@ -388,6 +410,7 @@ async function report() {
     checkIndexNowKey(),
     checkHome(),
     checkNotFound(),
+    checkFunctionRegion(),
     checkBots(urls[1] ?? `${SITE}/`),
     checkOldDomain(),
     checkBingIndex(),
